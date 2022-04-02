@@ -9,14 +9,27 @@ project(hello_usb)
 # initialize the Raspberry Pi Pico SDK
 pico_sdk_init()
 
-# rest of your project
-add_executable(hello_usb hello_usb.c)
+if (TARGET tinyusb_device)
 
-# pull in common dependencies
-target_link_libraries(hello_usb pico_stdlib)
+    # rest of your project
+    add_executable(hello_usb hello_usb.c)
 
-# create map/bin/hex/uf2 file etc.
-pico_add_extra_outputs(hello_usb)
+    # pull in common dependencies
+    target_link_libraries(hello_usb pico_stdlib)
 
-# add url via pico_set_program_url
-# pico_set_program_url(hello_usb)
+    # create map/bin/hex/uf2 file etc.
+    pico_add_extra_outputs(hello_usb)
+
+    # enable printf output via USB CDC (USB serial)
+    pico_enable_stdio_usb(hello_usb 1)
+
+    # disable printf output via uart
+    pico_enable_stdio_uart(hello_usb 0)
+
+    # add url via pico_set_program_url
+    # pico_set_program_url(hello_usb)
+
+elseif (PICO_ON_DEVICE)
+    message(WARNING "not building hello_usb becuase TinyUSB submodule is not initialized in the SDK")
+
+endif()
